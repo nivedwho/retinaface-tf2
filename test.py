@@ -23,9 +23,9 @@ flags.DEFINE_float('down_scale_factor', 1.0, 'down-scale factor for inputs')
 
 def main(_argv):
     # init
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-    os.environ['CUDA_VISIBLE_DEVICES'] = FLAGS.gpu
-
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "0"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    
     logger = tf.get_logger()
     logger.disabled = True
     logger.setLevel(logging.FATAL)
@@ -37,6 +37,7 @@ def main(_argv):
     model = RetinaFaceModel(cfg, training=False, iou_th=FLAGS.iou_th,
                             score_th=FLAGS.score_th)
 
+    """
     # load checkpoint
     checkpoint_dir = './checkpoints/' + cfg['sub_name']
     checkpoint = tf.train.Checkpoint(model=model)
@@ -123,8 +124,7 @@ def main(_argv):
             cv2.imshow('frame', frame)
             if cv2.waitKey(1) == ord('q'):
                 exit()
-
-
+    """
 if __name__ == '__main__':
     try:
         app.run(main)

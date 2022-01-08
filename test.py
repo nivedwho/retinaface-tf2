@@ -36,6 +36,14 @@ def main(_argv):
     # define network
     model = RetinaFaceModel(cfg, training=False, iou_th=FLAGS.iou_th,
                             score_th=FLAGS.score_th)
+    converter = tf.lite.TFLiteConverter.from_keras_model(model)
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
+    converter.representative_dataset = representative_dataset
+    converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8, tf.lite.OpsSet.SELECT_TF_OPS]
+    converter.inference_input_type = tf.uint8  # or tf.uint8
+    converter.inference_output_type = tf.uint8  # or tf.uint8
+
+    tflite_model = converter.convert()
 
     """
     # load checkpoint

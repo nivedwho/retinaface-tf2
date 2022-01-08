@@ -32,7 +32,12 @@ def main(_argv):
     set_memory_growth()
 
     cfg = load_yaml(FLAGS.cfg_path)
-
+    
+    def representative_dataset():
+      for _ in range(100):
+        data = np.random.rand(1, 3, 480, 480)
+        yield [data.astype(np.float32)]
+    
     # define network
     model = RetinaFaceModel(cfg, training=False, iou_th=FLAGS.iou_th,
                             score_th=FLAGS.score_th)

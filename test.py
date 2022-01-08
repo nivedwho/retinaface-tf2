@@ -41,6 +41,8 @@ def main(_argv):
     # define network
     model = RetinaFaceModel(cfg, training=False, iou_th=FLAGS.iou_th,
                             score_th=FLAGS.score_th)
+    
+    """
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     converter.representative_dataset = representative_dataset
@@ -61,7 +63,8 @@ def main(_argv):
     else:
         print("[*] Cannot find ckpt from {}.".format(checkpoint_dir))
         exit()
-
+    model.save('retinatest')
+    
     if not FLAGS.webcam:
         if not os.path.exists(FLAGS.img_path):
             print(f"cannot find image path from {FLAGS.img_path}")
@@ -137,7 +140,7 @@ def main(_argv):
             cv2.imshow('frame', frame)
             if cv2.waitKey(1) == ord('q'):
                 exit()
-    """
+
 if __name__ == '__main__':
     try:
         app.run(main)

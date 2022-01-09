@@ -63,7 +63,7 @@ def main(_argv):
     else:
         print("[*] Cannot find ckpt from {}.".format(checkpoint_dir))
         exit()
-    model.save('retinatest.h5')
+    model.save('retinatest')
     """
     if not FLAGS.webcam:
         if not os.path.exists(FLAGS.img_path):

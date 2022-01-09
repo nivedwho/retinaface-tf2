@@ -63,8 +63,8 @@ def main(_argv):
     else:
         print("[*] Cannot find ckpt from {}.".format(checkpoint_dir))
         exit()
-    model.save('retinatest')
-    
+    model.save('retinatest.h5')
+    """
     if not FLAGS.webcam:
         if not os.path.exists(FLAGS.img_path):
             print(f"cannot find image path from {FLAGS.img_path}")
@@ -140,7 +140,7 @@ def main(_argv):
             cv2.imshow('frame', frame)
             if cv2.waitKey(1) == ord('q'):
                 exit()
-
+    """
 if __name__ == '__main__':
     try:
         app.run(main)

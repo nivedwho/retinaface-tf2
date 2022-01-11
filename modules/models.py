@@ -49,7 +49,7 @@ def Backbone(backbone_type='ResNet50', use_pretrain=True):
             preprocess = tf.keras.applications.resnet.preprocess_input
         elif backbone_type == 'MobileNetV2':
             extractor = MobileNetV2(
-                input_shape=x.shape[1:], include_top=False, weights=weights)
+                input_shape=x.shape[1:], alpha=0.25, include_top=False, weights=weights)
             pick_layer1 = 54  # [80, 80, 32]
             pick_layer2 = 116  # [40, 40, 96]
             pick_layer3 = 143  # [20, 20, 160]

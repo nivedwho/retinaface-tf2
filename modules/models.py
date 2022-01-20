@@ -49,7 +49,7 @@ def Backbone(backbone_type='ResNet50', use_pretrain=True):
             preprocess = tf.keras.applications.resnet.preprocess_input
         elif backbone_type == 'MobileNetV2':
             extractor = MobileNetV2(
-                input_shape=x.shape[1:], alpha=0.25, include_top=False, weights=weights)
+                input_shape=x.shape[1:], include_top=False, weights=weights)
             pick_layer1 = 54  # [80, 80, 32]
             pick_layer2 = 116  # [40, 40, 96]
             pick_layer3 = 143  # [20, 20, 160]
@@ -170,9 +170,8 @@ class BboxHead(tf.keras.layers.Layer):
 
         return tf.reshape(x, [-1, h * w * self.num_anchor, 4])
 
-
+"""
 class LandmarkHead(tf.keras.layers.Layer):
-    """Landmark Head Layer"""
     def __init__(self, num_anchor, wd, name='LandmarkHead', **kwargs):
         super(LandmarkHead, self).__init__(name=name, **kwargs)
         self.num_anchor = num_anchor
@@ -183,6 +182,7 @@ class LandmarkHead(tf.keras.layers.Layer):
         x = self.conv(x)
 
         return tf.reshape(x, [-1, h * w * self.num_anchor, 10])
+"""
 
 
 class ClassHead(tf.keras.layers.Layer):
@@ -221,9 +221,6 @@ def RetinaFaceModel(cfg, training=False, iou_th=0.4, score_th=0.02,
     bbox_regressions = tf.concat(
         [BboxHead(num_anchor, wd=wd, name=f'BboxHead_{i}')(f)
          for i, f in enumerate(features)], axis=1)
-    landm_regressions = tf.concat(
-        [LandmarkHead(num_anchor, wd=wd, name=f'LandmarkHead_{i}')(f)
-         for i, f in enumerate(features)], axis=1)
     classifications = tf.concat(
         [ClassHead(num_anchor, wd=wd, name=f'ClassHead_{i}')(f)
          for i, f in enumerate(features)], axis=1)
@@ -231,17 +228,17 @@ def RetinaFaceModel(cfg, training=False, iou_th=0.4, score_th=0.02,
     classifications = tf.keras.layers.Softmax(axis=-1)(classifications)
 
     if training:
-        out = (bbox_regressions, landm_regressions, classifications)
+        out = (bbox_regressions, classifications)
     else:
         # only for batch size 1
-        preds = tf.concat(  # [bboxes, landms, landms_valid, conf]
-            [bbox_regressions[0], landm_regressions[0],
+        preds = tf.concat(
+            [bbox_regressions[0], 
              tf.ones_like(classifications[0, :, 0][..., tf.newaxis]),
              classifications[0, :, 1][..., tf.newaxis]], 1)
+        
         priors = prior_box_tf((tf.shape(inputs)[1], tf.shape(inputs)[2]),
                               cfg['min_sizes'],  cfg['steps'], cfg['clip'])
         decode_preds = decode_tf(preds, priors, cfg['variances'])
-
         selected_indices = tf.image.non_max_suppression(
             boxes=decode_preds[:, :4],
             scores=decode_preds[:, -1],
